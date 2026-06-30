@@ -1,0 +1,111 @@
+erDiagram
+    USER {
+        bigint id PK
+        string full_name
+        string email
+        string role
+        string status
+        datetime created_at
+    }
+
+    STUDENT_PROFILE {
+        bigint id PK
+        bigint user_id FK
+        string subscription_status
+        datetime subscription_expired_at
+    }
+
+    INSTRUCTOR_PROFILE {
+        bigint id PK
+        bigint user_id FK
+        decimal revenue_share_rate
+        string payout_account
+    }
+
+    COURSE {
+        bigint id PK
+        bigint instructor_id FK
+        string title
+        string level
+        decimal price
+        string status
+        datetime published_at
+    }
+
+    LESSON {
+        bigint id PK
+        bigint course_id FK
+        string title
+        string content_type
+        int display_order
+        int duration_seconds
+    }
+
+    ENROLLMENT {
+        bigint id PK
+        bigint student_id FK
+        bigint course_id FK
+        datetime enrolled_at
+        string access_source
+        string status
+    }
+
+    ORDER_HEADER {
+        bigint id PK
+        bigint student_id FK
+        decimal total_amount
+        decimal discount_amount
+        string payment_status
+        datetime created_at
+    }
+
+    ORDER_ITEM {
+        bigint id PK
+        bigint order_id FK
+        bigint course_id FK
+        decimal original_price
+        decimal final_price
+    }
+
+    PAYMENT {
+        bigint id PK
+        bigint order_id FK
+        string payment_method
+        string provider_transaction_id
+        string status
+        datetime paid_at
+    }
+
+    REVENUE_SHARE {
+        bigint id PK
+        bigint order_item_id FK
+        bigint instructor_id FK
+        decimal instructor_amount
+        decimal platform_amount
+        string settlement_status
+    }
+
+    LEARNING_PROGRESS {
+        bigint id PK
+        bigint student_id FK
+        bigint lesson_id FK
+        int progress_percent
+        int last_position_seconds
+        boolean completed
+        datetime updated_at
+    }
+
+    USER ||--o| STUDENT_PROFILE : has
+    USER ||--o| INSTRUCTOR_PROFILE : has
+    INSTRUCTOR_PROFILE ||--o{ COURSE : owns
+    COURSE ||--o{ LESSON : contains
+    STUDENT_PROFILE ||--o{ ENROLLMENT : enrolls
+    COURSE ||--o{ ENROLLMENT : included_in
+    STUDENT_PROFILE ||--o{ ORDER_HEADER : places
+    ORDER_HEADER ||--o{ ORDER_ITEM : contains
+    COURSE ||--o{ ORDER_ITEM : sold_as
+    ORDER_HEADER ||--o{ PAYMENT : paid_by
+    ORDER_ITEM ||--o| REVENUE_SHARE : generates
+    INSTRUCTOR_PROFILE ||--o{ REVENUE_SHARE : receives
+    STUDENT_PROFILE ||--o{ LEARNING_PROGRESS : tracks
+    LESSON ||--o{ LEARNING_PROGRESS : tracked_by
